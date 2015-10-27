@@ -1,3 +1,6 @@
+#ifndef MAPTEL_H
+#define MAPTEL_H
+
 const size_t TEL_NUM_MAX_LEN = 22;
 
 // Tworzy słownik i zwraca liczbę naturalną będącą jego identyfikatorem.
@@ -22,3 +25,4 @@ void maptel_erase(unsigned long id, char const *tel_src);
 void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len);
 
 
+#endif
