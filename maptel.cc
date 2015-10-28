@@ -21,30 +21,34 @@ using namespace std;
 typedef unordered_map<string, string>  dictionary_t;
 
 static vector< dictionary_t > all_dictionaries;
+
 static vector< bool > there_dictionary;
-static unsigned long id_new_dictionary = 0;
+unsigned long& id_new_dict() {
+	static unsigned long id_new_dictionary = 0;
+	return id_new_dictionary;
+}
 static bool is_valid_phone_number(char const * number);
 
 
 unsigned long maptel_create(){
 	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_create()" << endl;
-	ios_base::Init();
+	// DRUGI RAZ INIT W JEDNEJ FUNKCJI? TO CELOWE? NA RAZIE WYKOMENTOWALAM ios_base::Init();
 	
 	dictionary_t dic = dictionary_t();
 	all_dictionaries.push_back(dic);
 	there_dictionary.push_back(true);
 	
 	if(debug) cerr << "maptel: maptel_create: new map id = "
-	               << id_new_dictionary << endl;
-	return id_new_dictionary++;
+	               << id_new_dict() << endl;
+	return (id_new_dict())++;
 }
 
 void maptel_delete(unsigned long id){
 	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;
 	
-	assert(id < id_new_dictionary);
+	assert(id < id_new_dict());
 	if(there_dictionary[id]){
 		there_dictionary[id] = false;
 		all_dictionaries[id].clear();
@@ -65,6 +69,7 @@ void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 	string dst(tel_dst);
 	
 	all_dictionaries[id][src] = dst;
+	// W UNORDERED MAP NIE UZYWA SIE FUNKCJI INSERT DLA MAP? PYTAM, BO NIE WIEM
 	if(debug) cerr << "maptel: maptel_insert: inserted" << endl;
 }
 
@@ -76,7 +81,7 @@ void maptel_erase(unsigned long id, char const *tel_src){
 	assert(is_valid_phone_number(tel_src));
 	string src(tel_src);
 	
-	assert(id < id_new_dictionary && there_dictionary[id]);
+	assert(id < id_new_dict() && there_dictionary[id]);
 	
 	if (all_dictionaries[id].count(src) > 0){
 		all_dictionaries[id].erase(src);
@@ -90,7 +95,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	if(debug) cerr << "maptel: maptel_transform(" << id << ", " 
 	               << tel_src << ", " << &tel_dst << ", " << len << ")" << endl;
 	               
-	assert(id < id_new_dictionary && there_dictionary[id]);
+	assert(id < id_new_dict() && there_dictionary[id]);
 	assert(is_valid_phone_number(tel_src));
 	
 	const string src(tel_src);
@@ -117,6 +122,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 
 // Tą funkcje też trzeba w pełni debugować ? 
 // czy wystarczy dlaczego zwróciła 'false' ?
+//NIE DEBUGOWALABYM, WYJSCIE SIE NIE BEDZIE ZGADZAC I WYWALI SIE NA TESTACH
 static bool is_valid_phone_number(char const * number){
 	size_t len = 0;
 	while(number[len] != '\0' && len <= TEL_NUM_MAX_LEN) len++;
