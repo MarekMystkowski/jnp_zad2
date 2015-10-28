@@ -27,7 +27,9 @@ static bool is_valid_phone_number(char const * number);
 
 
 unsigned long maptel_create(){
+	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_create()" << endl;
+	ios_base::Init();
 	
 	dictionary_t dic = dictionary_t();
 	all_dictionaries.push_back(dic);
@@ -39,6 +41,7 @@ unsigned long maptel_create(){
 }
 
 void maptel_delete(unsigned long id){
+	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;
 	
 	assert(id < id_new_dictionary);
@@ -53,6 +56,7 @@ void maptel_delete(unsigned long id){
 }
 
 void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
+	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_insert(" << id << ", " << tel_src
 	               << ", " << tel_dst << ")" << endl;
 	assert(is_valid_phone_number(tel_src));
@@ -65,6 +69,7 @@ void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 }
 
 void maptel_erase(unsigned long id, char const *tel_src){
+	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_erase(" << id << ", " << tel_src
 	               <<")" << endl;
 
@@ -81,13 +86,14 @@ void maptel_erase(unsigned long id, char const *tel_src){
 }
 
 void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len){
+	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_transform(" << id << ", " 
 	               << tel_src << ", " << &tel_dst << ", " << len << ")" << endl;
-	
+	               
 	assert(id < id_new_dictionary && there_dictionary[id]);
 	assert(is_valid_phone_number(tel_src));
-	const string src(tel_src);
 	
+	const string src(tel_src);
 	string result = src;
 	bool is_cycle = false;
 	while(all_dictionaries[id].count(result) > 0  && not is_cycle){
@@ -112,7 +118,6 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 // Tą funkcje też trzeba w pełni debugować ? 
 // czy wystarczy dlaczego zwróciła 'false' ?
 static bool is_valid_phone_number(char const * number){
-	
 	size_t len = 0;
 	while(number[len] != '\0' && len <= TEL_NUM_MAX_LEN) len++;
 	
