@@ -113,6 +113,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 		if(number_on_path.count(result) > 0){
 			// Jest cykl.
 			is_cycle = true;
+			result = string(tel_src);
 		}
 		number_on_path[result] = true;
 	}
