@@ -9,39 +9,34 @@ extern "C" {
 };
 
 #ifndef DNDEBUG
-	const bool debug = true;
+	static const bool debug = false;
 #else
-	const bool debug = false;
+	static const bool debug = true;
 #endif
 using namespace std;
 
-//a moze tak najbardzij brutalna inicjalizacja strumieni? wpisac ios_base::Init() gdzie tylko sie da?
-
-
 typedef unordered_map<string, string>  dictionary_t;
 
-vector< dictionary_t >& all_dictionaries() {
+static vector< dictionary_t >& all_dictionaries() {
 	static vector< dictionary_t> all_dict;
 	return all_dict;
 }
 
-vector< bool >& there_dictionary() {
+static vector< bool >& there_dictionary() {
 	static vector< bool> there_dict;
 	return there_dict;
 }
 
-
-unsigned long& id_new_dict() {
+static unsigned long& id_new_dict() {
 	static unsigned long id_new_dictionary = 0;
 	return id_new_dictionary;
 }
-static bool is_valid_phone_number(char const * number);
 
+static bool is_valid_phone_number(char const * number);
 
 unsigned long maptel_create(){
 	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_create()" << endl;
-	// DRUGI RAZ INIT W JEDNEJ FUNKCJI? TO CELOWE? NA RAZIE WYKOMENTOWALAM ios_base::Init();
 	
 	dictionary_t dic = dictionary_t();
 	all_dictionaries().push_back(dic);
@@ -54,9 +49,9 @@ unsigned long maptel_create(){
 
 void maptel_delete(unsigned long id){
 	if(debug) ios_base::Init();
-	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;
-	
+	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;	
 	assert(id < id_new_dict());
+	
 	if((there_dictionary())[id]){
 		(there_dictionary())[id] = false;
 		(all_dictionaries())[id].clear();
@@ -73,11 +68,12 @@ void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 	               << ", " << tel_dst << ")" << endl;
 	assert(is_valid_phone_number(tel_src));
 	assert(is_valid_phone_number(tel_dst));
+	
 	string src(tel_src);
 	string dst(tel_dst);
 	
 	(all_dictionaries())[id][src] = dst;
-	// W UNORDERED MAP NIE UZYWA SIE FUNKCJI INSERT DLA MAP? PYTAM, BO NIE WIEM
+	
 	if(debug) cerr << "maptel: maptel_insert: inserted" << endl;
 }
 
@@ -87,11 +83,10 @@ void maptel_erase(unsigned long id, char const *tel_src){
 	               <<")" << endl;
 
 	assert(is_valid_phone_number(tel_src));
-	string src(tel_src);
-	
 	assert(id < id_new_dict() && (there_dictionary())[id]);
 	
-	if ((all_dictionaries())[id].count(src) > 0){
+	string src(tel_src);
+	if((all_dictionaries())[id].count(src) > 0){
 		(all_dictionaries())[id].erase(src);
 		if(debug) cerr << "maptel: maptel_erase: erased" << endl;
 	}
@@ -106,51 +101,45 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	assert(id < id_new_dict() && (there_dictionary())[id]);
 	assert(is_valid_phone_number(tel_src));
 	
-	const string src(tel_src);
-	string result = src;
+	string result(tel_src);
+	
+	// Do sprawdzania czy jest cyklu.
+	unordered_map<string, bool> number_on_path;
 	bool is_cycle = false;
+	number_on_path[result] = true;
+	
 	while((all_dictionaries())[id].count(result) > 0  && not is_cycle){
 		result= (all_dictionaries())[id][result];
-		if(result.compare(src) == 0){
+		if(number_on_path.count(result) > 0){
 			// Jest cykl.
 			is_cycle = true;
 		}
+		number_on_path[result] = true;
 	}
+	
 	if(debug && is_cycle) cerr << "maptel: maptel_transform:"
 	                              " cycle detected" << endl;
+	assert(result.size() + 1 <= len); // +1 , ze wzglêdu na '\0'na koñcu.
 	
-	assert(result.size() + 1 <= len); // +1 , ze wzglêdu na '\0 'na koñcu.
+	for(size_t i = 0; i < result.size(); i++) tel_dst[i] = result[i];
+	tel_dst[result.size()] = '\0';
 	
-	for(size_t i = 0; i < result.size(); i++)
-		tel_dst[i] = result[i];
-		tel_dst[result.size()] = '\0';
-	if(debug) cerr << "maptel: maptel_transform: " << src << " -> "
+	if(debug) cerr << "maptel: maptel_transform: " << tel_src << " -> "
 	               << result << "," << endl;
 }
 
-// T¹ funkcje te¿ trzeba w pe³ni debugowaæ ? 
-// czy wystarczy dlaczego zwróci³a 'false' ?
-//NIE DEBUGOWALABYM, WYJSCIE SIE NIE BEDZIE ZGADZAC I WYWALI SIE NA TESTACH
 static bool is_valid_phone_number(char const * number){
 	size_t len = 0;
 	while(number[len] != '\0' && len <= TEL_NUM_MAX_LEN) len++;
 	
-	if(len == 0){
-		if(debug) cerr << "maptel: is_valid_phone_numbe: empty number" << endl;
-		return false;
-	}
-	
-	if(len >  TEL_NUM_MAX_LEN){
-		if(debug) cerr << "maptel: is_valid_phone_numbe: number too longr" << endl;
+	if(len == 0 || len > TEL_NUM_MAX_LEN){
 		return false;
 	}
 	
 	for(size_t i = 0; i < len; i++){
 		if(number[i] < '0' && number[i] > '9'){
-			cerr << "maptel: is_valid_phone_numbe: " << number[i]
-			     << "  is not a digit" << endl;
 			return false;
-		} 	
+		}
 	}
 	return true;
 }
