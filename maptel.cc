@@ -8,10 +8,10 @@ extern "C" {
 	#include "maptel.h"
 };
 
-#ifndef DNDEBUG
-	static const bool debug = false;
-#else
+#ifndef NDEBUG
 	static const bool debug = true;
+#else
+	static const bool debug = false;
 #endif
 using namespace std;
 
