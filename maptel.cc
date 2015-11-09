@@ -4,9 +4,8 @@
 #include <cstring>
 #include <unordered_map>
 #include <assert.h>
-extern "C" { 
-	#include "maptel.h"
-};
+#include "maptel.h"
+
 
 #ifndef NDEBUG
 	static const bool debug = true;
@@ -35,11 +34,10 @@ static unsigned long& id_new_dict() {
 static bool is_valid_phone_number(char const * number);
 
 unsigned long maptel_create(){
-	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_create()" << endl;
 	
 	dictionary_t dic = dictionary_t();
-	all_dictionaries().push_back(dic);
+	(all_dictionaries()).push_back(dic);
 	(there_dictionary()).push_back(true);
 	
 	if(debug) cerr << "maptel: maptel_create: new map id = "
@@ -48,7 +46,6 @@ unsigned long maptel_create(){
 }
 
 void maptel_delete(unsigned long id){
-	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;	
 	assert(id < id_new_dict());
 	
@@ -63,7 +60,6 @@ void maptel_delete(unsigned long id){
 }
 
 void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
-	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_insert(" << id << ", " << tel_src
 	               << ", " << tel_dst << ")" << endl;
 	assert(is_valid_phone_number(tel_src));
@@ -78,7 +74,6 @@ void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 }
 
 void maptel_erase(unsigned long id, char const *tel_src){
-	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_erase(" << id << ", " << tel_src
 	               <<")" << endl;
 
@@ -94,7 +89,6 @@ void maptel_erase(unsigned long id, char const *tel_src){
 }
 
 void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size_t len){
-	if(debug) ios_base::Init();
 	if(debug) cerr << "maptel: maptel_transform(" << id << ", " 
 	               << tel_src << ", " << &tel_dst << ", " << len << ")" << endl;
 	               
@@ -103,7 +97,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	
 	string result(tel_src);
 	
-	// Do sprawdzania czy jest cyklu.
+	// Do sprawdzania czy wierzchołek jest w cyklu.
 	unordered_map<string, bool> number_on_path;
 	bool is_cycle = false;
 	number_on_path[result] = true;
