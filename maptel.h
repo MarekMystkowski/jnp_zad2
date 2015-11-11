@@ -1,4 +1,4 @@
-//Marek Mystkowski i Zuzanna Pilat
+// Marek Mystkowski i Zuzanna Pilat
 
 #ifndef MAPTEL_H
 #define MAPTEL_H
