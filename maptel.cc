@@ -109,7 +109,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	number_on_path[result] = true;
 	
 	while((all_dictionaries())[id].count(result) > 0  && not is_cycle){
-		result= (all_dictionaries())[id][result];
+		result = (all_dictionaries())[id][result];
 		if(number_on_path.count(result) > 0){
 			// Jest cykl.
 			is_cycle = true;
