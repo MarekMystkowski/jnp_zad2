@@ -1,3 +1,5 @@
+// Marek Mystkowski i Zuzanna Pilat
+
 #include <iostream>
 #include <string>
 #include <vector>
