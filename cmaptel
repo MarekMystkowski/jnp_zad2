@@ -1,8 +1,10 @@
 #ifndef CMAPTEL
 #define CMAPTEL
+
 #include <iostream>
+
 namespace jnp1 {
-		#include "maptel.h"
+	#include "maptel.h"
 }
 
 #endif
