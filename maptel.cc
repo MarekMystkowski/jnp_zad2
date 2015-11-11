@@ -54,15 +54,11 @@ unsigned long maptel_create(){
 void maptel_delete(unsigned long id){
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;	
 	assert(id < id_new_dictionary());
-	
-	if((there_dictionary())[id]){
-		(there_dictionary())[id] = false;
-		(all_dictionaries())[id].clear();
-		if(debug) cerr << "maptel: maptel_delete: map " << id
-		               << " deleted" << endl;
-	}
-	else if(debug) cerr << "maptel: maptel_delete: map " << id
-		                << " removed earlier" << endl;
+	assert((there_dictionary())[id]);
+	(there_dictionary())[id] = false;
+	(all_dictionaries())[id].clear();
+	if(debug) cerr << "maptel: maptel_delete: map " << id
+		<< " deleted" << endl;
 }
 
 void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
