@@ -12,26 +12,30 @@
 #else
 	static const bool debug = false;
 #endif
+
 using namespace std;
 
-typedef unordered_map<string, string>  dictionary_t;
+typedef unordered_map< string, string >  dictionary_t;
+
+static bool is_valid_phone_number(char const *number);
 
 static vector< dictionary_t >& all_dictionaries() {
-	static vector< dictionary_t> all_dict;
+	static vector< dictionary_t > all_dict;
 	return all_dict;
 }
 
+// Czy slownik o zadanym numerze istnieje.
 static vector< bool >& there_dictionary() {
-	static vector< bool> there_dict;
+	static vector< bool > there_dict;
 	return there_dict;
 }
 
-static unsigned long& id_new_dict() {
-	static unsigned long id_new_dictionary = 0;
-	return id_new_dictionary;
+static unsigned long& id_new_dictionary() {
+	static unsigned long id_new_dict = 0;
+	return id_new_dict;
 }
 
-static bool is_valid_phone_number(char const * number);
+
 
 unsigned long maptel_create(){
 	if(debug) cerr << "maptel: maptel_create()" << endl;
@@ -41,13 +45,13 @@ unsigned long maptel_create(){
 	(there_dictionary()).push_back(true);
 	
 	if(debug) cerr << "maptel: maptel_create: new map id = "
-	               << id_new_dict() << endl;
-	return (id_new_dict())++;
+	               << id_new_dictionary() << endl;
+	return (id_new_dictionary())++;
 }
 
 void maptel_delete(unsigned long id){
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;	
-	assert(id < id_new_dict());
+	assert(id < id_new_dictionary());
 	
 	if((there_dictionary())[id]){
 		(there_dictionary())[id] = false;
@@ -78,7 +82,7 @@ void maptel_erase(unsigned long id, char const *tel_src){
 	               <<")" << endl;
 
 	assert(is_valid_phone_number(tel_src));
-	assert(id < id_new_dict() && (there_dictionary())[id]);
+	assert(id < id_new_dictionary() && (there_dictionary())[id]);
 	
 	string src(tel_src);
 	if((all_dictionaries())[id].count(src) > 0){
@@ -92,13 +96,13 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	if(debug) cerr << "maptel: maptel_transform(" << id << ", " 
 	               << tel_src << ", " << &tel_dst << ", " << len << ")" << endl;
 	               
-	assert(id < id_new_dict() && (there_dictionary())[id]);
+	assert(id < id_new_dictionary() && (there_dictionary())[id]);
 	assert(is_valid_phone_number(tel_src));
 	
 	string result(tel_src);
 	
-	// Do sprawdzania czy wierzchołek jest w cyklu.
-	unordered_map<string, bool> number_on_path;
+	// Mapa do sprawdzania czy wierzchołek jest w cyklu.
+	unordered_map< string, bool > number_on_path;
 	bool is_cycle = false;
 	number_on_path[result] = true;
 	
@@ -114,7 +118,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	
 	if(debug && is_cycle) cerr << "maptel: maptel_transform:"
 	                              " cycle detected" << endl;
-	assert(result.size() + 1 <= len); // +1 , ze wzglêdu na '\0'na koñcu.
+	assert(result.size() + 1 <= len); // +1, ze wzgledu na '\0' na koncu.
 	
 	for(size_t i = 0; i < result.size(); i++) tel_dst[i] = result[i];
 	tel_dst[result.size()] = '\0';
