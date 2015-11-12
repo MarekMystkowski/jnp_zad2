@@ -2,8 +2,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
-#include <cstring>
 #include <unordered_map>
 #include <assert.h>
 #include "maptel.h"
@@ -21,15 +19,9 @@ typedef unordered_map< string, string >  dictionary_t;
 
 static bool is_valid_phone_number(char const *number);
 
-static vector< dictionary_t >& all_dictionaries() {
-	static vector< dictionary_t > all_dict;
+static unordered_map< unsigned long, dictionary_t >& all_dictionaries() {
+	static unordered_map< unsigned long, dictionary_t > all_dict;
 	return all_dict;
-}
-
-// Czy slownik o zadanym numerze istnieje.
-static vector< bool >& there_dictionary() {
-	static vector< bool > there_dict;
-	return there_dict;
 }
 
 static unsigned long& id_new_dictionary() {
@@ -38,13 +30,11 @@ static unsigned long& id_new_dictionary() {
 }
 
 
-
 unsigned long maptel_create(){
 	if(debug) cerr << "maptel: maptel_create()" << endl;
 	
 	dictionary_t dic = dictionary_t();
-	(all_dictionaries()).push_back(dic);
-	(there_dictionary()).push_back(true);
+	(all_dictionaries())[(id_new_dictionary())] = dic;
 	
 	if(debug) cerr << "maptel: maptel_create: new map id = "
 	               << id_new_dictionary() << endl;
@@ -53,10 +43,9 @@ unsigned long maptel_create(){
 
 void maptel_delete(unsigned long id){
 	if(debug) cerr << "maptel: maptel_delete(" << id << ")" << endl;	
-	assert(id < id_new_dictionary());
-	assert((there_dictionary())[id]);
-	(there_dictionary())[id] = false;
+	assert((all_dictionaries()).count(id) > 0);
 	(all_dictionaries())[id].clear();
+	(all_dictionaries()).erase(id);
 	if(debug) cerr << "maptel: maptel_delete: map " << id
 		<< " deleted" << endl;
 }
@@ -64,6 +53,7 @@ void maptel_delete(unsigned long id){
 void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 	if(debug) cerr << "maptel: maptel_insert(" << id << ", " << tel_src
 	               << ", " << tel_dst << ")" << endl;
+	assert((all_dictionaries()).count(id) > 0);
 	assert(is_valid_phone_number(tel_src));
 	assert(is_valid_phone_number(tel_dst));
 	
@@ -78,9 +68,8 @@ void maptel_insert(unsigned long id, char const *tel_src, char const *tel_dst){
 void maptel_erase(unsigned long id, char const *tel_src){
 	if(debug) cerr << "maptel: maptel_erase(" << id << ", " << tel_src
 	               <<")" << endl;
-
+	assert((all_dictionaries()).count(id) > 0);
 	assert(is_valid_phone_number(tel_src));
-	assert(id < id_new_dictionary() && (there_dictionary())[id]);
 	
 	string src(tel_src);
 	if((all_dictionaries())[id].count(src) > 0){
@@ -94,7 +83,7 @@ void maptel_transform(unsigned long id, char const *tel_src, char *tel_dst, size
 	if(debug) cerr << "maptel: maptel_transform(" << id << ", " 
 	               << tel_src << ", " << &tel_dst << ", " << len << ")" << endl;
 	               
-	assert(id < id_new_dictionary() && (there_dictionary())[id]);
+	assert((all_dictionaries()).count(id) > 0);
 	assert(is_valid_phone_number(tel_src));
 	
 	string result(tel_src);
